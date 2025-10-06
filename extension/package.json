@@ -1,0 +1,125 @@
+{
+  "name": "helios",
+  "displayName": "Helios - Local CodeLlama Assistant",
+  "description": "Privacy-focused, local-first code completion powered by CodeLlama",
+  "version": "0.1.0",
+  "publisher": "helios-dev",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Machine Learning",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "code completion",
+    "ai",
+    "local",
+    "privacy",
+    "codellama",
+    "offline"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "helios.toggleAssistant",
+        "title": "Toggle Helios Assistant",
+        "category": "Helios"
+      },
+      {
+        "command": "helios.runCurrentFile",
+        "title": "Run Current File",
+        "category": "Helios"
+      },
+      {
+        "command": "helios.runSelectedCode",
+        "title": "Run Selected Code",
+        "category": "Helios"
+      },
+      {
+        "command": "helios.restartServer",
+        "title": "Restart Inference Server",
+        "category": "Helios"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "helios.runCurrentFile",
+        "key": "ctrl+shift+f5",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "helios.runSelectedCode",
+        "key": "ctrl+shift+f6",
+        "when": "editorHasSelection"
+      }
+    ],
+    "configuration": {
+      "title": "Helios",
+      "properties": {
+        "helios.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Helios code completion"
+        },
+        "helios.serverUrl": {
+          "type": "string",
+          "default": "http://localhost:8000",
+          "description": "URL of the local inference server"
+        },
+        "helios.modelPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the CodeLlama model file"
+        },
+        "helios.maxTokens": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of tokens to generate"
+        },
+        "helios.temperature": {
+          "type": "number",
+          "default": 0.1,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Temperature for code generation"
+        },
+        "helios.autoComplete": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic code completion"
+        },
+        "helios.commentToCode": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable comment-to-code generation"
+        }
+      }
+    }
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "eslint": "^8.28.0",
+    "typescript": "^4.9.4",
+    "@vscode/test-electron": "^2.2.0",
+    "vsce": "^2.15.0"
+  },
+  "dependencies": {
+    "axios": "^1.5.0"
+  }
+}
