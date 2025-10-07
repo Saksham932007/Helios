@@ -54,6 +54,26 @@
         "command": "helios.runSelectedCode",
         "key": "ctrl+shift+f6",
         "when": "editorHasSelection"
+      },
+      {
+        "command": "helios.acceptCompletion",
+        "key": "tab",
+        "when": "editorTextFocus && heliosCompletionVisible"
+      },
+      {
+        "command": "helios.dismissCompletion",
+        "key": "escape",
+        "when": "editorTextFocus && heliosCompletionVisible"
+      },
+      {
+        "command": "helios.triggerCompletion",
+        "key": "ctrl+space",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "helios.generateFromComment",
+        "key": "ctrl+shift+g",
+        "when": "editorTextFocus"
       }
     ],
     "configuration": {
