@@ -42,6 +42,21 @@
         "command": "helios.restartServer",
         "title": "Restart Inference Server",
         "category": "Helios"
+      },
+      {
+        "command": "helios.showMetrics",
+        "title": "Show Performance Metrics",
+        "category": "Helios"
+      },
+      {
+        "command": "helios.openLogs",
+        "title": "Open Logs",
+        "category": "Helios"
+      },
+      {
+        "command": "helios.validateConfig",
+        "title": "Validate Configuration",
+        "category": "Helios"
       }
     ],
     "keybindings": [
