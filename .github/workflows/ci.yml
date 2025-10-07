@@ -1,0 +1,175 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-extension:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: extension/package-lock.json
+    
+    - name: Install extension dependencies
+      run: |
+        cd extension
+        npm ci
+    
+    - name: Lint extension code
+      run: |
+        cd extension
+        npm run lint
+    
+    - name: Compile extension
+      run: |
+        cd extension
+        npm run compile
+    
+    - name: Run extension tests
+      run: |
+        cd extension
+        xvfb-run -a npm test
+    
+    - name: Package extension
+      run: |
+        cd extension
+        npm run package
+
+  test-server:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, '3.10', '3.11']
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install server dependencies
+      run: |
+        cd server
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov black flake8
+    
+    - name: Lint server code
+      run: |
+        cd server
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        black --check .
+    
+    - name: Run server tests
+      run: |
+        cd server
+        pytest --cov=. --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./server/coverage.xml
+        flags: server
+        name: codecov-server
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [test-extension, test-server]
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install Ollama
+      run: |
+        curl -fsSL https://ollama.com/install.sh | sh
+        ollama serve &
+        sleep 10
+    
+    - name: Install dependencies
+      run: |
+        cd extension && npm ci
+        cd ../server && pip install -r requirements.txt
+    
+    - name: Start server
+      run: |
+        cd server
+        python main.py &
+        sleep 15
+    
+    - name: Run integration tests
+      run: |
+        # Test server health
+        curl -f http://localhost:8000/health
+        
+        # Test completion endpoint
+        curl -X POST http://localhost:8000/complete \
+          -H "Content-Type: application/json" \
+          -d '{"code":"def hello():", "language":"python", "position":{"line":0,"character":12}, "filename":"test.py"}'
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [test-extension, test-server, integration-test]
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install dependencies
+      run: |
+        cd extension
+        npm ci
+    
+    - name: Build and package
+      run: |
+        cd extension
+        npm run compile
+        npm run package
+    
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: true
+    
+    - name: Upload Extension Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./extension/helios-*.vsix
+        asset_name: helios-extension.vsix
+        asset_content_type: application/zip
