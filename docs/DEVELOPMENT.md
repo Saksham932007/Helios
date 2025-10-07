@@ -25,17 +25,20 @@ A comprehensive guide for contributing to and developing Helios, the local-first
 ### Initial Setup
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/your-username/helios.git
    cd helios
    ```
 
 2. **Run the installation script:**
+
    ```bash
    ./install.sh
    ```
 
 3. **Install development dependencies:**
+
    ```bash
    # Extension dependencies
    cd extension
@@ -50,11 +53,13 @@ A comprehensive guide for contributing to and developing Helios, the local-first
 ### Setting up Ollama
 
 1. **Install Ollama:**
+
    ```bash
    curl -fsSL https://ollama.ai/install.sh | sh
    ```
 
 2. **Pull CodeLlama model:**
+
    ```bash
    ollama pull codellama:7b-code
    ```
@@ -110,17 +115,20 @@ helios/
 ### Extension Development
 
 1. **Open extension in VS Code:**
+
    ```bash
    cd extension
    code .
    ```
 
 2. **Start development build:**
+
    ```bash
    npm run watch
    ```
 
 3. **Run extension in development:**
+
    - Press `F5` to launch Extension Development Host
    - Test your changes in the new VS Code window
 
@@ -132,12 +140,14 @@ helios/
 ### Server Development
 
 1. **Start development server:**
+
    ```bash
    cd server
    python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 2. **Run with Docker (recommended):**
+
    ```bash
    docker-compose up --build
    ```
@@ -198,9 +208,11 @@ docker-compose down
 ### Extension Debugging
 
 1. **Enable Developer Tools:**
+
    - In Extension Development Host: `Help > Toggle Developer Tools`
 
 2. **Check extension logs:**
+
    - Open Output panel: `View > Output`
    - Select "Helios" from dropdown
 
@@ -211,11 +223,13 @@ docker-compose down
 ### Server Debugging
 
 1. **Check server logs:**
+
    ```bash
    docker logs helios-server
    ```
 
 2. **Debug with Python debugger:**
+
    ```bash
    cd server
    python -m pdb main.py
@@ -231,16 +245,19 @@ docker-compose down
 ### Common Issues
 
 #### Extension not activating
+
 - Check `activationEvents` in `package.json`
 - Verify server is running and accessible
 - Check Output panel for error messages
 
 #### Completion not working
+
 - Verify Ollama is running: `ollama list`
 - Check server health: `curl http://localhost:8000/health`
 - Validate configuration: `./validate_config.py --workspace .`
 
 #### Performance issues
+
 - Run profiler: `./profile.py`
 - Monitor resources: `./monitor.py`
 - Check model size and hardware requirements
@@ -250,6 +267,7 @@ docker-compose down
 ### Version Management
 
 1. **Update version numbers:**
+
    ```bash
    # Extension
    cd extension
@@ -267,6 +285,7 @@ docker-compose down
 ### Building Release
 
 1. **Build extension:**
+
    ```bash
    cd extension
    npm run build
@@ -282,12 +301,14 @@ docker-compose down
 ### Publishing
 
 1. **Extension to VS Code Marketplace:**
+
    ```bash
    cd extension
    npx vsce publish
    ```
 
 2. **Server to Docker Hub:**
+
    ```bash
    docker tag helios-server:latest username/helios-server:latest
    docker push username/helios-server:latest
@@ -329,6 +350,7 @@ mypy .
 ### Git Hooks
 
 Pre-commit hooks automatically run:
+
 - Code formatting
 - Linting
 - Type checking
@@ -339,6 +361,7 @@ Pre-commit hooks automatically run:
 ### Common Development Issues
 
 #### Port conflicts
+
 ```bash
 # Check what's using port 8000
 lsof -i :8000
@@ -348,6 +371,7 @@ kill -9 <PID>
 ```
 
 #### Docker issues
+
 ```bash
 # Clean up containers
 docker-compose down
@@ -358,11 +382,13 @@ docker-compose build --no-cache
 ```
 
 #### Extension not loading
+
 1. Check VS Code version compatibility
 2. Verify all dependencies are installed
 3. Clear extension cache: `Ctrl+Shift+P > "Reload Window"`
 
 #### Model inference errors
+
 1. Verify Ollama is running: `ollama serve`
 2. Check model is available: `ollama list`
 3. Test model directly: `ollama run codellama:7b-code "def hello"`
@@ -370,18 +396,21 @@ docker-compose build --no-cache
 ### Performance Optimization
 
 #### Extension Performance
+
 - Minimize activation events
 - Use lazy loading for heavy operations
 - Debounce completion requests
 - Cache completion results
 
 #### Server Performance
+
 - Use async/await for I/O operations
 - Implement request queuing
 - Monitor memory usage
 - Use connection pooling
 
 #### Model Performance
+
 - Choose appropriate model size for hardware
 - Adjust context length and max tokens
 - Use quantized models (GGUF format)
